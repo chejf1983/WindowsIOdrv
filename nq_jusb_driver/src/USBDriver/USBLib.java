@@ -57,9 +57,8 @@ public class USBLib {
             if (clean) {
                 tmp.delete();
             }
-        }
-
-        if (!tmp.exists()) {
+            CreateDLLTempFile(Filename, false);
+        }else if (!tmp.exists()) {
             InputStream in = USBLib.class.getResourceAsStream("/Resource/" + Filename);
             FileOutputStream out = new FileOutputStream(tmp);
 

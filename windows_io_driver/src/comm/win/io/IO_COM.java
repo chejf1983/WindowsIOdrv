@@ -67,9 +67,8 @@ public class IO_COM implements WAbstractIO {
             if (tmp.exists()) {
                 tmp.delete();
             }
-        }
-        
-        if (!tmp.exists()) {
+            CreateDLLTempFile(Filename, false);
+        }else if (!tmp.exists()) {
             InputStream in = IO_COM.class.getResourceAsStream("/comm/resource/" + Filename);
             FileOutputStream out = new FileOutputStream(tmp);
             
