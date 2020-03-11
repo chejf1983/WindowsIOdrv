@@ -21,27 +21,27 @@ import java.util.concurrent.Future;
  * @author chejf
  */
 public class IO_COM implements WAbstractIO {
-    
+
     private boolean isClosed = true;
     private CommPortIdentifier comportId;
     private SerialPort comserialPort;
     private OutputStream comout = null;
     private InputStream comin = null;
-    
+
     private String comName;
     private int baundrate;
-    
+
     public IO_COM(String name, int baundrate) {
         this.comName = name;
         this.baundrate = baundrate;
     }
-    
+
     private static boolean IsInit = false;
-    
+
     public static void InitLib() throws Exception {
         InitLib(false);
     }
-    
+
     public static void InitLib(boolean clean) throws Exception {
         if (!IsInit) {
 //            CreateDLLTempFile("win32com.dll");
@@ -53,7 +53,7 @@ public class IO_COM implements WAbstractIO {
             IsInit = true;
         }
     }
-    
+
     private static String CreateDLLTempFile(String Filename, boolean clean) throws Exception {
         //System.out.println(System.getProperty("user.dir") + "\\jre\\bin");
         File tmp = new File(System.getProperty("user.dir") + "\\jre\\bin");
@@ -62,22 +62,22 @@ public class IO_COM implements WAbstractIO {
         } else {
             tmp = new File(System.getProperty("user.dir") + "\\" + Filename);
         }
-        
+
         if (clean) {
             if (tmp.exists()) {
                 tmp.delete();
             }
             CreateDLLTempFile(Filename, false);
-        }else if (!tmp.exists()) {
+        } else if (!tmp.exists()) {
             InputStream in = IO_COM.class.getResourceAsStream("/comm/resource/" + Filename);
             FileOutputStream out = new FileOutputStream(tmp);
-            
+
             int i;
             byte[] buf = new byte[1024];
             while ((i = in.read(buf)) != -1) {
                 out.write(buf, 0, i);
             }
-            
+
             in.close();
             out.close();
             System.out.println("create file:" + Filename);
@@ -86,9 +86,9 @@ public class IO_COM implements WAbstractIO {
         // return tmp.getAbsoluteFile().getAbsolutePath();
         return tmp.getCanonicalPath();
     }
-    
+
     private static int sendBufferLimit = 128;
-    
+
     @Override
     public void SendData(byte[] data) throws Exception {
         Thread.sleep(20);
@@ -104,19 +104,19 @@ public class IO_COM implements WAbstractIO {
             }
         }
     }
-    
+
     private byte[] rc_buffer = new byte[20480];
-    
+
     @Override
     public int ReceiveData(byte[] data, int timeout) throws Exception {
-        int index = 0;
+//        int index = 0;
         int rclen = 0;
         //10ms一个周期
         long start_time = System.currentTimeMillis();
+        byte[] tmp_data = new byte[1000];
         while (System.currentTimeMillis() - start_time < timeout) {
             //如果有数据，读一次
             if (comin.available() > 0) {
-                byte[] tmp_data = new byte[1000];
                 //读取到临时buffer中
                 int tmp_len = comin.read(tmp_data);
                 //将临时buffer复制到data中
@@ -131,7 +131,7 @@ public class IO_COM implements WAbstractIO {
             TimeUnit.MILLISECONDS.sleep(5);
 //            Thread.sleep(1);
         }
-        
+
         return rclen;
     }
     private Future<Integer> ret;
@@ -173,7 +173,7 @@ public class IO_COM implements WAbstractIO {
             this.ret.cancel(true);
         }
     }
-    
+
     private void CloseIO() {
         if (!this.IsClosed()) {
             try {
@@ -191,20 +191,20 @@ public class IO_COM implements WAbstractIO {
                 this.isClosed = true;
             }
         }
-        
+
     }
-    
+
     @Override
     public boolean IsClosed() {
         return this.isClosed;
     }
-    
+
     private void OpenIO() throws Exception {
         if (this.IsClosed()) {
             InitLib(false);
-            
+
             Enumeration portList = CommPortIdentifier.getPortIdentifiers();
-            
+
             while (portList.hasMoreElements()) {
                 comportId = (CommPortIdentifier) portList.nextElement();
                 if ((comportId.getPortType() == CommPortIdentifier.PORT_SERIAL)
@@ -218,12 +218,12 @@ public class IO_COM implements WAbstractIO {
                     comserialPort.setOutputBufferSize(10240);
                     comout = comserialPort.getOutputStream();
                     comin = comserialPort.getInputStream();
-                    
+
                     this.isClosed = false;
                     return;
                 }
             }
-            
+
             throw new Exception("Could not found Comport");
         }
     }
@@ -239,7 +239,7 @@ public class IO_COM implements WAbstractIO {
 //        this.usercoutlock.unlock();
         this.OpenIO();
     }
-    
+
     @Override
     public void Close() {
         CloseIO();
@@ -269,12 +269,12 @@ public class IO_COM implements WAbstractIO {
     public WIOInfo GetConnectInfo() {
         return new WIOInfo(IOTYPE.COM.toString(), this.comName, String.valueOf(this.baundrate));
     }
-    
+
     @Override
     public int MaxBuffersize() {
         return 65535;
     }
-    
+
     @Override
     public void SetConnectInfo(WIOInfo info) {
         if (info.iotype.contentEquals(IOTYPE.COM.toString())) {
@@ -282,5 +282,5 @@ public class IO_COM implements WAbstractIO {
             this.baundrate = Integer.valueOf(info.par[1]);
         }
     }
-    
+
 }
