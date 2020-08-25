@@ -6,21 +6,21 @@ package comm.win.io;
 
 //import gnu.io.CommPortIdentifier;
 //import gnu.io.SerialPort;
-import comm.absractio.WIOInfo;
+import nahon.comm.io.IOInfo;
 import java.io.*;
 import java.util.Enumeration;
 import java.util.concurrent.TimeUnit;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
 import comm.win.io.WindowsIOFactory.IOTYPE;
-import comm.absractio.WAbstractIO;
 import java.util.concurrent.Future;
+import nahon.comm.io.AbstractIO;
 
 /**
  *
  * @author chejf
  */
-public class IO_COM implements WAbstractIO {
+public class IO_COM implements AbstractIO {
 
     private boolean isClosed = true;
     private CommPortIdentifier comportId;
@@ -91,8 +91,8 @@ public class IO_COM implements WAbstractIO {
 
     @Override
     public void SendData(byte[] data) throws Exception {
-        Thread.sleep(20);
-//        TimeUnit.MILLISECONDS.sleep(20); // 485在接收完命令时，会有一个关闭延时，为了确保在连续发送时，不会出现丢包，每次发送前等待20ms，确保485已经关闭
+//        Thread.sleep(20);
+        TimeUnit.MILLISECONDS.sleep(20); // 485在接收完命令时，会有一个关闭延时，为了确保在连续发送时，不会出现丢包，每次发送前等待20ms，确保485已经关闭
         comserialPort.notifyOnOutputEmpty(true);
         for (int sendIndex = 0; sendIndex < data.length;) {
             if (data.length - sendIndex > sendBufferLimit) {
@@ -266,8 +266,8 @@ public class IO_COM implements WAbstractIO {
     // </editor-fold> 
 
     @Override
-    public WIOInfo GetConnectInfo() {
-        return new WIOInfo(IOTYPE.COM.toString(), this.comName, String.valueOf(this.baundrate));
+    public IOInfo GetConnectInfo() {
+        return new IOInfo(IOTYPE.COM.toString(), this.comName, String.valueOf(this.baundrate));
     }
 
     @Override
@@ -276,7 +276,7 @@ public class IO_COM implements WAbstractIO {
     }
 
     @Override
-    public void SetConnectInfo(WIOInfo info) {
+    public void SetConnectInfo(IOInfo info) {
         if (info.iotype.contentEquals(IOTYPE.COM.toString())) {
             this.comName = info.par[0];
             this.baundrate = Integer.valueOf(info.par[1]);

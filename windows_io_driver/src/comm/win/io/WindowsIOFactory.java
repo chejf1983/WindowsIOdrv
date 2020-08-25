@@ -8,8 +8,8 @@ package comm.win.io;
 import USBDriver.USBLib;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import comm.absractio.WIOInfo;
-import comm.absractio.WAbstractIO;
+import nahon.comm.io.IOInfo;
+import nahon.comm.io.AbstractIO;
 
 /**
  *
@@ -23,7 +23,7 @@ public class WindowsIOFactory {
         USB
     }
 
-    public static WAbstractIO CreateIO(WIOInfo con) {
+    public static AbstractIO CreateIO(IOInfo con) {
         if (!isInited) {
             try {
                 InitWindowsIODriver();
@@ -35,7 +35,7 @@ public class WindowsIOFactory {
             return null;
         }
 
-        WAbstractIO newio;
+        AbstractIO newio;
         switch (IOTYPE.valueOf(con.iotype)) {
             case COM:
                 newio = new IO_COM(con.par[0], Integer.valueOf(con.par[1]));
@@ -53,7 +53,7 @@ public class WindowsIOFactory {
         return newio;
     }
 
-    public static IOTYPE GetIOtype(WIOInfo con) {
+    public static IOTYPE GetIOtype(IOInfo con) {
         return IOTYPE.valueOf(con.iotype);
     }
 

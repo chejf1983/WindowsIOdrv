@@ -14,17 +14,17 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import comm.win.io.WindowsIOFactory.IOTYPE;
-import comm.absractio.WIOInfo;
-import comm.absractio.WAbstractIO;
+import nahon.comm.io.IOInfo;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import nahon.comm.io.AbstractIO;
 
 /**
  *
  * @author jiche
  */
-public class IO_TCP implements WAbstractIO {
+public class IO_TCP implements AbstractIO {
 
     private Socket mysocket;
     private OutputStream tcpout = null;
@@ -112,8 +112,8 @@ public class IO_TCP implements WAbstractIO {
 //    }
 
     @Override
-    public WIOInfo GetConnectInfo() {
-        return new WIOInfo(IOTYPE.TCP.toString(), this.serverIp, String.valueOf(this.portNum));
+    public IOInfo GetConnectInfo() {
+        return new IOInfo(IOTYPE.TCP.toString(), this.serverIp, String.valueOf(this.portNum));
     }
 
     @Override
@@ -150,7 +150,7 @@ public class IO_TCP implements WAbstractIO {
     }
 
     @Override
-    public void SetConnectInfo(WIOInfo info) {
+    public void SetConnectInfo(IOInfo info) {
         if (info.iotype.contentEquals(IOTYPE.TCP.toString())) {
             this.serverIp = info.par[0];
             this.portNum = Integer.valueOf(info.par[1]);

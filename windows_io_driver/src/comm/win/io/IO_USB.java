@@ -7,19 +7,19 @@ package comm.win.io;
 
 import USBDriver.USBDevice;
 import comm.win.io.WindowsIOFactory.IOTYPE;
-import comm.absractio.WIOInfo;
-import comm.absractio.WAbstractIO;
+import nahon.comm.io.IOInfo;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import nahon.comm.io.AbstractIO;
 
 /**
  *
  * @author Administrator
  */
-public class IO_USB implements WAbstractIO {
+public class IO_USB implements AbstractIO {
 
     private USBDevice usbdev;
     private int usbnum;
@@ -80,8 +80,8 @@ public class IO_USB implements WAbstractIO {
     }
 
     @Override
-    public WIOInfo GetConnectInfo() {
-        return new WIOInfo(IOTYPE.USB.toString(), String.valueOf(this.usbdev.GetDevNum()));
+    public IOInfo GetConnectInfo() {
+        return new IOInfo(IOTYPE.USB.toString(), String.valueOf(this.usbdev.GetDevNum()));
     }
 
     @Override
@@ -90,7 +90,7 @@ public class IO_USB implements WAbstractIO {
     }
 
     @Override
-    public void SetConnectInfo(WIOInfo info) {
+    public void SetConnectInfo(IOInfo info) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
