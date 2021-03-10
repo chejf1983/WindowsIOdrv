@@ -92,7 +92,8 @@ public class IO_COM implements AbstractIO {
     @Override
     public void SendData(byte[] data) throws Exception {
 //        Thread.sleep(20);
-        TimeUnit.MILLISECONDS.sleep(20); // 485在接收完命令时，会有一个关闭延时，为了确保在连续发送时，不会出现丢包，每次发送前等待20ms，确保485已经关闭
+//        TimeUnit.MILLISECONDS.sleep(20); // 485在接收完命令时，会有一个关闭延时，为了确保在连续发送时，不会出现丢包，每次发送前等待20ms，确保485已经关闭
+        //延时放到协议当中去做
         comserialPort.notifyOnOutputEmpty(true);
         for (int sendIndex = 0; sendIndex < data.length;) {
             if (data.length - sendIndex > sendBufferLimit) {
