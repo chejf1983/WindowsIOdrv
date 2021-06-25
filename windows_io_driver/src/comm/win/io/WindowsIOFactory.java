@@ -6,6 +6,9 @@
 package comm.win.io;
 
 import USBDriver.USBLib;
+import gnu.io.CommPortIdentifier;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import nahon.comm.io.IOInfo;
@@ -17,6 +20,7 @@ import nahon.comm.io.AbstractIO;
  */
 public class WindowsIOFactory {
 
+    // <editor-fold defaultstate="collapsed" desc="创建IO"> 
     public enum IOTYPE {
         COM,
         TCP,
@@ -56,7 +60,9 @@ public class WindowsIOFactory {
     public static IOTYPE GetIOtype(IOInfo con) {
         return IOTYPE.valueOf(con.iotype);
     }
+    // </editor-fold> 
 
+    // <editor-fold defaultstate="collapsed" desc="初始化驱动"> 
     private static boolean isInited = false;
 
     public static void InitWindowsIODriver(boolean clean) throws Exception {
@@ -71,6 +77,40 @@ public class WindowsIOFactory {
     public static void InitWindowsIODriver() throws Exception {
         InitWindowsIODriver(false);
     }
+    // </editor-fold> 
+
+    public static String[] listCOM() throws Exception {
+        if (!isInited) {
+            InitWindowsIODriver(false);
+        }
+        Enumeration portList = CommPortIdentifier.getPortIdentifiers();
+
+        /* Clean USB and Comm Input */
+        ArrayList<String> ret = new ArrayList();
+
+        /* Foud Comm port */
+        while (portList.hasMoreElements()) {
+            CommPortIdentifier comportId = (CommPortIdentifier) portList.nextElement();
+
+            /* If name is start with NT, it is an virtual USB comm port */
+            ret.add(comportId.getName());
+        }
+
+        return ret.toArray(new String[0]);
+    }
+
+    public static IOInfo[] listAllUSB() throws Exception {
+        if (!isInited) {
+            InitWindowsIODriver(false);
+        }
+        USBLib.InitLib();
+        ArrayList<IOInfo> ret = new ArrayList();
+        for (int i : USBLib.SearchUSBDev()) {
+            ret.add(new IOInfo(WindowsIOFactory.IOTYPE.USB.toString(), i + ""));
+        }
+
+        return ret.toArray(new IOInfo[0]);
+    }
 
     public static void main(String[] args) {
         try {
@@ -80,4 +120,5 @@ public class WindowsIOFactory {
             Logger.getLogger(WindowsIOFactory.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
 }
